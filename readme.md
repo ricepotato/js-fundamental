@@ -14,6 +14,28 @@ var score;
 
 ## scope
 
+### lexical scope
+
+자바스크립트 엔진은 함수를 어디에서 호출했는지가 아니라 함수를 어디에 정의했는지에 따라 상위 스코프를 결정한다. 이를 lexical scope 라고 한다.
+
+아래 코드는 1, 1 을 출력한다.
+
+```js
+var x = 1;
+
+function foo() {
+  var x = 10;
+  bar();
+}
+
+function bar() {
+  console.log(x);
+}
+
+foo(); // 1
+bar(); // 1
+```
+
 ### var 변수의 scope
 
 var 변수는 오로지 함수의 코드 블록만을 지역 스코프로 인정한다.  
@@ -41,27 +63,6 @@ for (var i = 0; i < 5; i++) {
 }
 
 console.log(i); // 5
-```
-
-### JS 에서의 lexical scope
-
-어디서 정의했는지에 따라 상위 스코프가 결정된다.  
-아래 코드는 1, 1 을 출력한다.
-
-```js
-var x = 1;
-
-function foo() {
-  var x = 10;
-  bar();
-}
-
-function bar() {
-  console.log(x);
-}
-
-foo(); // 1
-bar(); // 1
 ```
 
 ### 전역객체
@@ -343,3 +344,92 @@ function convertArgsToArray() {
   return arr;
 }
 ```
+
+## closure
+
+함수와 그 함수가 선언된 렉시컬 환경과의 조합이다.
+
+```js
+const x = 1;
+
+function outerFunc() {
+  const x = 10;
+
+  function innerFunc() {
+    console.log(x);
+  }
+
+  innerFunc();
+}
+
+outerFunc();
+```
+
+함수는 자신의 내부 슬롯 [[Environment]] 에 자신이 정의된 환경, 즉 상위 스코프의 참조를 저장한다.  
+함수는 내부 슬롯 [[Environment]] 에 저장한 렉시컬 환경의 참조, 즉 상위 스코프를 자신이 존재하는 한 기억한다.
+
+```js
+const p = 1;
+
+function outerFunc3() {
+  const p = 10;
+  const inner = function () {
+    console.log(p);
+  };
+  return inner;
+}
+
+const innerfunc3 = outerFunc3(); // 이 시점에서 outerFunc3 는 생명주기를 마감함.
+innerfunc3(); //10
+// 외부 함수보다 중첩 함수가 더 오래 유지되는 경우 중첨 함수는 이미 생명주기가 종료된 outerFunc3 변수를 참조할 수 있다.
+// 이 중첨 함수를 closure 라고한다.
+```
+
+### 활용
+
+상태를 안전하게 변경하고 유지하기 위해 사용한다. 상태를 안전하게 은닉(information hiding) 하고 특정 함수에게만 상태 변경을 허용한다.
+
+아래 코드는 오류를 일으킬 가능성을 내포하고 있는 좋지 않은 코드이다.
+
+```js
+let num = 0;
+
+const increase = function () {
+  return ++num;
+};
+
+console.log(increse());
+console.log(increse());
+console.log(increse());
+```
+
+closure 를 사용한 개선된 코드이다.
+
+```js
+const increase = (function () {
+  let num = 0;
+
+  return function () {
+    return ++num;
+  };
+})();
+
+console.log(increase());
+console.log(increase());
+console.log(increase());
+```
+
+num 변수에 누구든 접근할 수 있고 변경할 수 있다.(암묵적 결합)
+
+## functional programming
+
+- style of writing code.
+- declarative. not imperative.
+- safer, easier to debug/maintain.
+- do everything with functions.
+- avoid side effect. use `pure function`.
+- use `higher order function`.
+  - functions can be inputs/outputs.
+  - Abstracting Patterns of Control.
+- don't iterate. use `map`, `reduce`, `filter`.
+- avoid mutability. use `immutable` data.
