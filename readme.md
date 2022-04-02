@@ -182,3 +182,24 @@ let foo = 1;
   let foo = 2; // foo 가 hoisting 되어 위에서 오류가 발생. 이 문장이 없으면 전역변수 foo 를 읽을 수 있어 오류가 발생하지 않는다.
 }
 ```
+
+## JS 에서의 비동기
+
+- JS 엔진은 하나의 실행 컨텍스트를 가지며 single thread 로 동작함.
+- 한번에 하나의 함수만 실행할 수 있음.
+
+### event loop 와 task queue
+
+#### task queue
+
+setTimeout 이나 setInterval 과 같은 비동기 함수의 콜백 또는 이벤트 핸들러가 일시적으로 보관되는 영역.
+
+#### event loop
+
+call stack 에 현재 실행중인 컨텍스트가 있는지, task queue 에 대기중인 함수가 있는 지 확인한다.  
+call stack 이 비어있고 task queue 에 대기중인 함수가 있으면 순차적으로 call stack 으로 이동시킨다.
+
+V8 을 비롯한 대부분의 JS 엔진은 크게 2가지 영역으로 구분된다.
+
+- call stack
+- heap
