@@ -421,6 +421,13 @@ console.log(increase());
 
 num 변수에 누구든 접근할 수 있고 변경할 수 있다.(암묵적 결합)
 
+## Arrow Function
+
+- non-constructor. new 로 객체를 생성할 수 없음.
+- this 가 자체 binding 을 갖지 않음. 상위 scope 의 this 를 그대로 참조(lexical this).
+- super 가 자체 binding 을 갖지 않음. 상위 scope 의 super 를 그대로 참조.
+- arguments 가 자체 binding 을 갖지 않음. 상위 scope 의 arguments 를 그대로 참조 .
+
 ## functional programming
 
 - style of writing code.
