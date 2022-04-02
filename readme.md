@@ -203,3 +203,143 @@ V8 을 비롯한 대부분의 JS 엔진은 크게 2가지 영역으로 구분된
 
 - call stack
 - heap
+
+## 생성자 함수에 의한 객체 생성
+
+함수 앞에 new 를 붙여 객체 생성
+
+- 반환값을 적지 않으면 암묵적으로 새로 생성된 객체가 return 됨
+- 생성자 함수에 의해 생성된 객체는 호출가능하다.
+
+```js
+function Circle(radius) {
+  this.radius = radius;
+  this.getDiameter = function () {
+    return 2 * this.radius;
+  };
+}
+
+const circle1 = new Circle(3); // 생성자 함수에 의한 객체 생성
+```
+
+함수의 정의 방식에 따라 constructor 와 non-constructor 를 구분한다.
+
+```js
+function foo() {}
+const bar = function () {};
+const baz = {
+  x: function () {}, // 메서드 아님. 일반 함수.
+};
+
+new foo();
+new bar();
+new baz.x();
+
+const arrow = () => {};
+
+new arrow(); // error.
+
+const obj = {
+  x() {}, // 메서드임. 축약표현은 메서드.
+};
+
+new obj.x(); // error. 일반 함수만 new 로 생성할 수 있음.
+```
+
+new 연산자에 의한 객체 생성
+
+```js
+function add(x, y) {
+  return x + y;
+}
+
+// 일반 함수를 new 연산자로 호출함.
+let inst = new add();
+
+// 객체를 return 하지 않으면 return 값이 무시된다.
+console.log(inst);
+
+function createUser(name, role) {
+  return { name, role };
+}
+
+inst = new createUser("Lee", "admin");
+
+// 함수가 생성한 객체 반환
+console.log(inst);
+
+function Circle(radius) {
+  console.log(new.target); // undefined. new 와 함께 호출되었으면 함수 자신.
+  this.radius = radius;
+  this.getDiameter = function () {
+    return 2 * radius;
+  };
+}
+
+// 생성자 없이 일반함수 호출;
+const circle = Circle(5);
+
+console.log(circle); // return 값이 없으므로 undefined;
+
+// 일반 함수내의 this 는 전역 window 또는 global 객체
+console.log(radius); // 5
+console.log(getDiameter()); // 10
+
+circle.getDiameter(); // error. circle 이 undefined 이므로.
+```
+
+## this
+
+this 는 객체 자신의 프로퍼티나 메서드를 참조하기 위한 자기 참조 변수(self-referencing variable)다.
+
+| 함수 호출 방식 | this 가 가리키는 값                      |
+| :------------- | :--------------------------------------- |
+| 일반함수       | 전역 객체 (browser: window node: global) |
+| 메서드         | 메서드를 호출한 객체(마침표 앞의 객체)   |
+| 생성자 함수    | 생성자 함수가 생성할 객체                |
+
+```js
+function foo() {
+  console.log(this);
+}
+
+foo(); // 일반함수 호출 this 는 전역 객체 browser: window, node: global
+
+const obj = { foo };
+
+obj.foo(); // 메서드 호출. this 는 obj
+
+const inst = new foo(); // 생성자 함수. this 는 inst
+```
+
+### call, apply, bind
+
+```js
+function foo() {
+  console.log(this);
+}
+
+foo(); // 일반함수 호출 this 는 전역 객체 browser: window, node: global
+
+const obj = { foo };
+
+obj.foo(); // 메서드 호출. this 는 obj
+
+const inst = new foo(); // 생성자 함수. this 는 inst
+
+const bar = { name: "bar" };
+
+foo.call(bar); // bar / apply 와는 parameter 입력방식의 차이
+foo.apply(bar); // bar
+foo.bind(bar)(); // bar
+
+// 유사 arrary arguments 를 array 로 변환
+function convertArgsToArray() {
+  console.log(arguments);
+
+  const arr = Array.prototype.slice.call(arguments);
+  console.log(arr);
+
+  return arr;
+}
+```
